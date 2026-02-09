@@ -18,8 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('modulo_formativo_id')->nullable();
             $table->string('codigo', 50);
             $table->string('descripcion');
-            $table->float('peso_porcentaje')
-                ->nullable()
+            $table->float('peso_porcentaje')->nullable()
                 ->check('peso_porcentaje >= 0 AND peso_porcentaje <= 100');
             $table->integer('orden')->check('orden >= 1');
             $table->timestamps();
