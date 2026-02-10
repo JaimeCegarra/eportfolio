@@ -61,4 +61,6 @@ class FamiliasProfesionalesController extends Controller
 
         return redirect()->route('familias.show', [$familiaProfesional->id]);
     }
-};
+
+
+}

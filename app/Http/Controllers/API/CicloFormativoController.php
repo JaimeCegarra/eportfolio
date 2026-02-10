@@ -18,12 +18,17 @@ class CicloFormativoController extends Controller
         );
     }
 
-    public function store(Request $request, $familiaId)
+    public function store(Request $request)
     {
-        $data = json_decode($request->getContent(), true);
-        $data['familia_profesional_id'] = $familiaId;
+        $request->validate([
+            'familia_profesional_id' => 'required|exists:famílias_profesionales,id',
+            'nombre' => 'required|string|max:255',
+            'codigo' => 'required|string|max:255',
+            'grado' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+        ]);
 
-        $ciclo = CicloFormativo::create($data);
+        $ciclo = CicloFormativo::create($request->all());
 
         return new CicloFormativoResource($ciclo);
     }
