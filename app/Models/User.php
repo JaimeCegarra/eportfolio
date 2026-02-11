@@ -46,4 +46,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+
+
+    public function before (User $user, string $ability): ?bool
+    {
+        if ($user->isAdministrador()) {
+            return true;
+        }
+        return null;
+    }
+        
 }

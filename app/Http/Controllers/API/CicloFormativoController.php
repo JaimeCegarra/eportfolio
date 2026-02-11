@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CicloFormativoResource;
 use App\Models\CicloFormativo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CicloFormativoController extends Controller
 {
@@ -20,10 +21,11 @@ class CicloFormativoController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'familia_profesional_id' => 'required|exists:famílias_profesionales,id',
             'nombre' => 'required|string|max:255',
-            'codigo' => 'required|string|max:255',
+            'codigo' => 'required|string|max:255|unique:ciclos_formativos,codigo',
             'grado' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
         ]);
@@ -31,6 +33,12 @@ class CicloFormativoController extends Controller
         $ciclo = CicloFormativo::create($request->all());
 
         return new CicloFormativoResource($ciclo);
+
+        return response()->json([
+            'message' => 'Ciclo Formativo creado correctamente',
+            'data' => new CicloFormativoResource($ciclo)
+        ], 201);
+
     }
 
     public function show($familiaId, CicloFormativo $cicloFormativo)
@@ -64,7 +72,7 @@ class CicloFormativoController extends Controller
 
         try {
             $cicloFormativo->delete();
-            return response()->json(null, 204);
+            return response()->json(['message' => 'CicloFormativo eliminado correctamente'], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error: ' . $e->getMessage()

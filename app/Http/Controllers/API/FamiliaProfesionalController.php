@@ -21,9 +21,14 @@ class FamiliaProfesionalController extends Controller
 
     public function store(Request $request)
     {
-        $data = json_decode($request->getContent(), true);
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'imagen' => 'nullable|string',
+            'codigo' => 'required|string|max:255|unique:familias_profesionales,codigo',
+        ]);
 
-        $familia = FamiliaProfesional::create($data);
+        $familia = FamiliaProfesional::create($request->all());
 
         return new FamiliaProfesionalResource($familia);
     }
