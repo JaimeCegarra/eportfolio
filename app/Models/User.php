@@ -49,12 +49,9 @@ class User extends Authenticatable
 
 
 
-    public function before (User $user, string $ability): ?bool
+    public function isAdministrador(User $user)
     {
-        if ($user->isAdministrador()) {
-            return true;
-        }
-        return null;
+        return $this->email === config('app.admin_email');
     }
-        
+
 }

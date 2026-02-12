@@ -12,32 +12,45 @@ class CicloFormativoController extends Controller
 {
     public function index(Request $request, $familiaId)
     {
+        $search = $request->query('search');
+
         return CicloFormativoResource::collection(
             CicloFormativo::where('familia_profesional_id', $familiaId)
+                ->where(function ($query) use ($search) {
+                    $query->where('nombre', 'like', "%{$search}%")
+                        ->orWhere('codigo', 'like', "%{$search}%");
+                })
                 ->orderBy($request->sort ?? 'id', $request->order ?? 'asc')
                 ->paginate($request->per_page)
         );
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $familiaId)
     {
 
+        abort_if($request->user()->cannot('create', CicloFormativo::class), 403);
+
         $request->validate([
-            'familia_profesional_id' => 'required|exists:famílias_profesionales,id',
+
             'nombre' => 'required|string|max:255',
             'codigo' => 'required|string|max:255|unique:ciclos_formativos,codigo',
-            'grado' => 'required|string|max:255',
+            'grado' => 'required|in:basico,medio,superior',
             'descripcion' => 'nullable|string',
         ]);
 
-        $ciclo = CicloFormativo::create($request->all());
+        Gate::authorize('create', CicloFormativo::class);
+
+        $ciclo = CicloFormativo::create([
+        'familia_profesional_id' => $familiaId,
+        'nombre' => $request->nombre,
+        'codigo' => $request->codigo,
+        'grado' => $request->grado,
+        'descripcion' => $request->descripcion,
+    ]);
 
         return new CicloFormativoResource($ciclo);
 
-        return response()->json([
-            'message' => 'Ciclo Formativo creado correctamente',
-            'data' => new CicloFormativoResource($ciclo)
-        ], 201);
+
 
     }
 
@@ -52,6 +65,8 @@ class CicloFormativoController extends Controller
 
     public function update(Request $request, $familiaId, CicloFormativo $cicloFormativo)
     {
+        Gate::authorize('update', $cicloFormativo);
+
         if ($cicloFormativo->familia_profesional_id != $familiaId) {
             abort(404);
         }
@@ -66,6 +81,9 @@ class CicloFormativoController extends Controller
 
     public function destroy($familiaId, CicloFormativo $cicloFormativo)
     {
+
+        Gate::authorize('delete', $cicloFormativo);
+
         if ($cicloFormativo->familia_profesional_id != $familiaId) {
             abort(404);
         }

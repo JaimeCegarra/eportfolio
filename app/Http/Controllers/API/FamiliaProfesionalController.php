@@ -11,11 +11,13 @@ class FamiliaProfesionalController extends Controller
 {
     public function index(Request $request)
     {
+        $search = $request->query('search');
+
         return FamiliaProfesionalResource::collection(
-            FamiliaProfesional::orderBy(
-                $request->sort ?? 'id',
-                $request->order ?? 'asc'
-            )->paginate($request->per_page)
+            FamiliaProfesional::where('nombre', 'like', "%{$search}%")
+                ->orWhere('codigo', 'like', "%{$search}%")
+                ->orderBy($request->sort ?? 'id', $request->order ?? 'asc')
+                ->paginate($request->per_page)
         );
     }
 

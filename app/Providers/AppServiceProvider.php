@@ -25,15 +25,18 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-        Gate::before(function (User $user, string $ability) {
-      if ($user->isAdministrator()) {
-          return true;
-      }
-    });
+
         ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
             return config('app.frontend_url')."/password-reset/$token?email={$notifiable->getEmailForPasswordReset()}";
         });
-    Gate::policy(CicloFormativo::class, CicloFormativoPolicy::class);
+
+         Gate::policy(CicloFormativo::class, CicloFormativoPolicy::class);
+       Gate::before(function (User $user, string $ability) {
+           if ($user->isAdministrador($user)) {
+               return true;
+           }
+           return null;
+       });
 
     }
 }
