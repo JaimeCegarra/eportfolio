@@ -14,10 +14,11 @@ use App\Http\Controllers\API\EvidenciasController as APIEvidenciasController;
 use App\Http\Controllers\API\TareasController;
 use App\Http\Controllers\EvidenciasController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
+
 use Illuminate\Support\Facades\Route;
 use Psr\Http\Message\ServerRequestInterface;
 use Tqdev\PhpCrudApi\Api;
+use Tqdev\PhpCrudApi\Config\Config;
 
 
 
@@ -28,8 +29,9 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 Route::prefix('v1')->group(function () {
 
-    Route::apiResource('resultados_aprendizaje', ResultadoAprendizajeController::class)->parameters([
-        'resultados_aprendizaje' => 'resultadoAprendizaje'
+    Route::apiResource('modulos-formativos.resultados-aprendizaje', ResultadoAprendizajeController::class)->parameters([
+        'modulos-formativos' => 'moduloFormativo',
+        'resultados-aprendizaje' => 'resultadoAprendizaje'
     ]);
 
     Route::apiResource('criterios_evaluacion', CriterioEvaluacionController::class)->parameters([
@@ -50,7 +52,8 @@ Route::prefix('v1')->group(function () {
     ]);
 
     Route::apiResource('ciclos-formativos.modulos-formativos', ModuloFormativoController::class)->parameters([
-            'modulos-formativos' => 'moduloFormativo'
+            'modulos-formativos' => 'moduloFormativo',
+            'modulos-impartidos' => 'moduloFormativo'
     ]);
 
     Route::apiResource('evaluaciones', EvaluacionController::class)

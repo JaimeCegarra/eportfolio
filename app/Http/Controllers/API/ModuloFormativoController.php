@@ -11,8 +11,14 @@ class ModuloFormativoController extends Controller
 {
     public function index(Request $request, $cicloId)
     {
+        $search = $request->query('search');
+
         return ModuloFormativoResource::collection(
             ModuloFormativo::where('ciclo_formativo_id', $cicloId)
+                ->where(function ($query) use ($search) {
+                    $query->where('nombre', 'like', "%{$search}%")
+                        ->orWhere('codigo', 'like', "%{$search}%");
+                })
                 ->orderBy($request->sort ?? 'id', $request->order ?? 'asc')
                 ->paginate($request->per_page)
         );
@@ -20,6 +26,17 @@ class ModuloFormativoController extends Controller
 
     public function store(Request $request, $cicloId)
     {
+            $request->validate([
+                
+                'nombre' => 'required|string|max:255',
+                'codigo' => 'required|string|max:255|unique:modulos_formativos,codigo',
+                'horas_totales' => 'required|integer',
+                'curso_escolar' => 'required|string|max:255',
+                'centro' => 'required|string|max:255',
+                'docente_id' => 'nullable|integer|unique',
+                'descripcion' => 'nullable|string',
+            ]);
+
         $data = json_decode($request->getContent(), true);
         $data['ciclo_formativo_id'] = $cicloId;
 
@@ -30,18 +47,12 @@ class ModuloFormativoController extends Controller
 
     public function show($cicloId, ModuloFormativo $moduloFormativo)
     {
-        if ($moduloFormativo->ciclo_formativo_id != $cicloId) {
-            abort(404);
-        }
 
         return new ModuloFormativoResource($moduloFormativo);
     }
 
     public function update(Request $request, $cicloId, ModuloFormativo $moduloFormativo)
     {
-        if ($moduloFormativo->ciclo_formativo_id != $cicloId) {
-            abort(404);
-        }
 
         $data = json_decode($request->getContent(), true);
         $data['ciclo_formativo_id'] = $cicloId;
@@ -53,17 +64,9 @@ class ModuloFormativoController extends Controller
 
     public function destroy($cicloId, ModuloFormativo $moduloFormativo)
     {
-        if ($moduloFormativo->ciclo_formativo_id != $cicloId) {
-            abort(404);
-        }
 
-        try {
-            $moduloFormativo->delete();
-            return response()->json(null, 204);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error: ' . $e->getMessage()
-            ], 400);
-        }
+        $moduloFormativo->delete();
+
+        return response()->json(['message' => 'ModuloFormativo eliminado correctamente'], 200);
     }
 }

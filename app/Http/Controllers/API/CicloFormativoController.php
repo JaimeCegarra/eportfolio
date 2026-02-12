@@ -28,8 +28,6 @@ class CicloFormativoController extends Controller
     public function store(Request $request, $familiaId)
     {
 
-        abort_if($request->user()->cannot('create', CicloFormativo::class), 403);
-
         $request->validate([
 
             'nombre' => 'required|string|max:255',

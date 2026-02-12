@@ -19,7 +19,7 @@ return new class extends Migration
               ->cascadeOnDelete();
 
         $table->string('nombre');
-        $table->string('codigo')->unique();
+        $table->string('codigo');
 
         $table->integer('horas_totales')->nullable();
         $table->string('curso_escolar')->nullable();
