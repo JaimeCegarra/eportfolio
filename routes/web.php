@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CiclosFormativosController;
 use App\Http\Controllers\EvidenciasController;
 use App\Http\Controllers\FamiliasProfesionalesController;
+use App\Http\Controllers\PortfolioImportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResultadosAprendizajesController;
 use App\Models\CriterioEvaluacion;
@@ -108,5 +109,20 @@ Route::prefix('evidencias')->group(function () {
             Route::post('/evidencias/create', [EvidenciasController::class, 'postCreate'])->name('evidencias.postCreate');
         });
     });
+
+
+    Route::middleware(['auth'])->group(function () {
+    // Formulario de importación
+    Route::get('/portfolio/import', [PortfolioImportController::class, 'showImportForm'])
+        ->name('portfolio.import.form');
+
+    // Importar desde JSON Resume
+    Route::post('/portfolio/import/json-resume', [PortfolioImportController::class, 'importJsonResume'])
+        ->name('portfolio.import.json-resume');
+
+    // Importar desde GitHub
+    Route::post('/portfolio/import/github', [PortfolioImportController::class, 'importGitHub'])
+        ->name('portfolio.import.github');
+});
 
 require __DIR__.'/auth.php';
